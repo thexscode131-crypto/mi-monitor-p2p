@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import ccxt
+import json
 
 # --- CONFIGURACIÓN DE LA PÁGINA WEB ---
 st.set_page_config(page_title="Libro de Órdenes P2P", layout="wide")
@@ -17,7 +18,7 @@ try:
     # Inicializamos la conexión oficial a Binance usando CCXT
     exchange = ccxt.binance()
     
-    # Parámetros exactos para el P2P de Binance
+    # Parámetros para el P2P de Binance
     payload = {
         "asset": "USDT",
         "fiat": "VES",
@@ -27,8 +28,10 @@ try:
         "tradeType": "BUY"
     }
     
-    # LLAVE MAESTRA: Usamos exchange.request para llamar directamente al endpoint del P2P
-    # Esta ruta es universal en la API de Binance
+    # SOLUCIÓN AL ERROR: Convertimos el diccionario en un texto JSON plano
+    json_body = json.dumps(payload)
+    
+    # Hacemos la llamada directa usando el cuerpo ya formateado como texto
     p2p_data = exchange.request(
         path='c2c/adv/search',
         api='public',
@@ -37,7 +40,7 @@ try:
         headers={
             'Content-Type': 'application/json'
         },
-        body=payload
+        body=json_body  # <--- Aquí pasamos el JSON corregido
     )
     
     # Verificamos que Binance haya respondido con datos exitosos
