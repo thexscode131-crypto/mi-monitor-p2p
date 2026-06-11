@@ -18,15 +18,27 @@ try:
     exchange = ccxt.binance()
     
     # Parámetros exactos para el P2P de Binance
-    # Solicitamos órdenes de tipo 'BUY' (compradores de tus USDT) en Bolívares (VES)
-    p2p_data = exchange.publicGetC2cAdvSearch({
+    payload = {
         "asset": "USDT",
         "fiat": "VES",
         "merchantCheck": False,
         "page": 1,
         "rows": 10,
         "tradeType": "BUY"
-    })
+    }
+    
+    # LLAVE MAESTRA: Usamos exchange.request para llamar directamente al endpoint del P2P
+    # Esta ruta es universal en la API de Binance
+    p2p_data = exchange.request(
+        path='c2c/adv/search',
+        api='public',
+        method='POST',
+        params={},
+        headers={
+            'Content-Type': 'application/json'
+        },
+        body=payload
+    )
     
     # Verificamos que Binance haya respondido con datos exitosos
     if p2p_data.get("success") and p2p_data.get("data"):
